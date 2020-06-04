@@ -1,26 +1,41 @@
 import React from 'react';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
+import thunk from 'redux-thunk';
+//components
 import Counter from './Counter';
-import { createStore } from 'redux';
-import { DECREASE, RESET, INCREASE } from './actions';
-import reducer from './reducers';
+import Modal from './Modal';
+import Products from './Products';
 
-//setup initial state
-const defaultState = {
-  count: 54,
-  name: 'Ravish',
-};
+//reducers
+import countReducer from './countReducer';
+import modalReducer from './modalReducer';
+import productReducer from './productReducer';
 
+const middleware = [thunk];
 //setup store :to store data
-const store = createStore(reducer, defaultState);
+//use comine reducers to combine& send reducer acc to their type
+const store = createStore(
+  combineReducers({
+    countState: countReducer,
+    modalState: modalReducer,
+    productState: productReducer,
+  }),
+  composeWithDevTools(applyMiddleware(...middleware))
+);
 
-//action
-store.dispatch({ type: RESET });
-store.dispatch({ type: DECREASE });
-store.dispatch({ type: INCREASE });
-store.dispatch({ type: INCREASE });
+//actions
 
 const App = () => {
-  return <Counter state={store.getState()} />;
+  return (
+    <Provider store={store}>
+      <Counter />;
+      <Modal />
+      <Products />
+    </Provider>
+  );
 };
 
 export default App;
